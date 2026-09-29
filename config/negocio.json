@@ -1,0 +1,28 @@
+{
+  "_comentario": "Datos de la barbería que muestra la landing. Para usar el sistema con otro cliente, se cambia este archivo y db/02_seed.sql. Los valores marcados como EJEMPLO hay que reemplazarlos con lo relevado en la Fase 0.",
+  "nombre": "Fadep Barber Studio",
+  "slogan": "Fades, barbas y cortes con detalle.",
+  "descripcion": "Estudio de barbería. Reservá tu turno online en menos de un minuto, sin esperar respuesta por WhatsApp.",
+  "direccion": "Dirección de EJEMPLO 1234, Buenos Aires",
+  "mapa_embed_query": "Buenos Aires, Argentina",
+  "instagram": "fadepbarberstudio",
+  "whatsapp": "5491100000000",
+  "horarios_texto": [
+    "Lunes: cerrado",
+    "Martes a viernes: 10 a 20 h",
+    "Sábados: 9 a 18 h"
+  ],
+  "colores": {
+    "fondo": "#0f0f10",
+    "superficie": "#1a1a1c",
+    "texto": "#f2f2f2",
+    "texto_suave": "#a1a1a6",
+    "acento": "#c9a45c"
+  },
+  "zona_horaria": "America/Argentina/Buenos_Aires",
+  "reservas": {
+    "paso_minutos": 15,
+    "anticipacion_minima_minutos": 60,
+    "dias_hacia_adelante": 30
+  }
+}

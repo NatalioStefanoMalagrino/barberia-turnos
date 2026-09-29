@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block titulo %}Agenda · {{ negocio.nombre }}{% endblock %}
+{% block body_class %}panel{% endblock %}
+
+{% block contenido %}
+<header class="nav">
+  <div class="contenedor nav__inner">
+    <span class="marca">{{ negocio.nombre }}</span>
+    <span class="nav__usuario">{{ usuario.nombre }}</span>
+    <form method="post" action="/panel/logout"><button class="boton boton--chico boton--borde">Salir</button></form>
+  </div>
+</header>
+
+<main class="contenedor panel__main">
+  <div class="fecha-nav">
+    <a class="boton boton--chico boton--borde" href="/panel?fecha={{ anterior }}" aria-label="Día anterior">←</a>
+    <div class="fecha-nav__centro">
+      <h1>{{ fecha | fecha_larga | capitalize }}</h1>
+      {% if not es_hoy %}<a href="/panel">Ir a hoy</a>{% endif %}
+    </div>
+    <a class="boton boton--chico boton--borde" href="/panel?fecha={{ siguiente }}" aria-label="Día siguiente">→</a>
+  </div>
+
+  {% if msg %}<p class="aviso aviso--ok">{{ msg }}</p>{% endif %}
+  {% if error %}<p class="aviso aviso--error">{{ error }}</p>{% endif %}
+
+  <ul class="resumen">
+    <li><strong>{{ resumen.reservado }}</strong> pendientes</li>
+    <li><strong>{{ resumen.completado }}</strong> atendidos</li>
+    <li><strong>{{ resumen.ausente }}</strong> faltazos</li>
+    <li><strong>{{ resumen.ingresos | pesos }}</strong> cobrado</li>
+  </ul>
+
+  {% if not turnos %}
+    <p class="vacio">No hay turnos este día.</p>
+  {% endif %}
+
+  <ol class="agenda">
+    {% for t in turnos %}
+    {% set ini = t.inicio.astimezone(TZ) %}
+    <li class="turno turno--{{ t.estado }}">
+      <div class="turno__hora">{{ ini.strftime('%H:%M') }}</div>
+      <div class="turno__info">
+        <strong>{{ t.cliente }}</strong>
+        {% if t.visitas_previas == 0 %}<span class="chip">Nuevo</span>{% endif %}
+        {% if t.origen == 'manual' %}<span class="chip chip--suave">Manual</span>{% endif %}
+        <span>{{ t.servicio }}{% if not usuario.barbero_id %} · {{ t.barbero }}{% endif %}</span>
+        <a class="tel" href="https://wa.me/{{ t.telefono | whatsapp }}" target="_blank" rel="noopener">WhatsApp {{ t.telefono }}</a>
+      </div>
+      <div class="turno__acciones">
+        {% if t.estado == 'reservado' %}
+          {# Un formulario por botón: funciona sin JavaScript y con un solo toque #}
+          <form method="post" action="/panel/turnos/{{ t.id }}/estado">
+            <input type="hidden" name="fecha" value="{{ fecha }}">
+            <button name="estado" value="completado" class="accion accion--ok" title="Vino">✓ Vino</button>
+            <button name="estado" value="ausente" class="accion accion--mal" title="No vino">✗ Faltó</button>
+            <button name="estado" value="cancelado" class="accion" title="Cancelar"
+                    onclick="return confirm('¿Cancelar este turno?')">Cancelar</button>
+          </form>
+        {% else %}
+          <span class="estado estado--{{ t.estado }}">{{ t.estado | capitalize }}</span>
+        {% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+
+  <div class="panel__formularios">
+    <details class="tarjeta">
+      <summary>+ Cargar turno (WhatsApp, teléfono, sin turno)</summary>
+      <form method="post" action="/panel/turnos" class="form-grid">
+        <label class="campo">Día <input type="date" name="fecha" value="{{ fecha }}" required></label>
+        <label class="campo">Hora <input type="time" name="hora" step="300" required></label>
+        <label class="campo">Servicio
+          <select name="servicio_id">{% for s in servicios %}<option value="{{ s.id }}">{{ s.nombre }} ({{ s.duracion_min }}')</option>{% endfor %}</select>
+        </label>
+        <label class="campo">Barbero
+          <select name="barbero_id">
+            {% for b in barberos if not usuario.barbero_id or b.id == usuario.barbero_id %}<option value="{{ b.id }}">{{ b.nombre }}</option>{% endfor %}
+          </select>
+        </label>
+        <label class="campo">Nombre del cliente <input name="nombre" required></label>
+        <label class="campo">Celular <input name="telefono" type="tel" required></label>
+        <button class="boton boton--ancho" type="submit">Guardar turno</button>
+      </form>
+    </details>
+
+    <details class="tarjeta">
+      <summary>Bloquear horario (franco, trámite, vacaciones)</summary>
+      <form method="post" action="/panel/bloqueos" class="form-grid">
+        <label class="campo">Día <input type="date" name="fecha" value="{{ fecha }}" required></label>
+        <label class="campo">Barbero
+          <select name="barbero_id">
+            {% for b in barberos if not usuario.barbero_id or b.id == usuario.barbero_id %}<option value="{{ b.id }}">{{ b.nombre }}</option>{% endfor %}
+          </select>
+        </label>
+        <label class="campo">Desde <input type="time" name="desde" required></label>
+        <label class="campo">Hasta <input type="time" name="hasta" required></label>
+        <label class="campo campo--ancho">Motivo <input name="motivo" placeholder="Opcional"></label>
+        <button class="boton boton--ancho" type="submit">Bloquear</button>
+      </form>
+    </details>
+
+    {% if not usuario.barbero_id %}
+    <form class="tarjeta" method="post" action="/panel/actualizar-datos">
+      <input type="hidden" name="fecha" value="{{ fecha }}">
+      <strong>Datos para Power BI</strong>
+      <p class="nota">
+        {% if ultimo_etl %}Última actualización: {{ ultimo_etl.fin.astimezone(TZ).strftime('%d/%m %H:%M') }} h
+        {% if ultimo_etl.estado != 'ok' %}(con error){% endif %}
+        {% else %}Todavía no se generaron.{% endif %}
+      </p>
+      <button class="boton boton--borde boton--ancho" type="submit">Actualizar datos del tablero</button>
+    </form>
+    {% endif %}
+  </div>
+</main>
+{% endblock %}

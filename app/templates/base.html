@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}{{ negocio.nombre }}{% endblock %}</title>
+  <meta name="description" content="{{ negocio.descripcion }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/styles.css">
+  {# Los colores de la marca salen de config/negocio.json: otra barbería = otro JSON #}
+  <style>
+    :root {
+      --fondo: {{ negocio.colores.fondo }};
+      --superficie: {{ negocio.colores.superficie }};
+      --texto: {{ negocio.colores.texto }};
+      --texto-suave: {{ negocio.colores.texto_suave }};
+      --acento: {{ negocio.colores.acento }};
+    }
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  {% block contenido %}{% endblock %}
+  {% block scripts %}{% endblock %}
+</body>
+</html>

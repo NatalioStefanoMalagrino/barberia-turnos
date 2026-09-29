@@ -1,0 +1,32 @@
+# Corre el ETL todas las noches, sin necesidad de tener un servidor prendido.
+# Configuración: en GitHub, Settings > Secrets and variables > Actions >
+# New repository secret, cargar DATABASE_URL con la cadena de conexión
+# de Supabase o Neon (la misma del .env, pero de producción).
+
+name: ETL nocturno
+
+on:
+  schedule:
+    # GitHub usa hora UTC: 06:17 UTC = 03:17 en Buenos Aires.
+    # Minuto "raro" a propósito: a las en punto GitHub está saturado y demora.
+    - cron: "17 6 * * *"
+  workflow_dispatch:        # botón para correrlo a mano desde la pestaña Actions
+
+jobs:
+  etl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Correr ETL
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m data.etl

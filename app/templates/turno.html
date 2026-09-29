@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block titulo %}Tu turno · {{ negocio.nombre }}{% endblock %}
+
+{% block contenido %}
+<main class="pagina-centrada">
+  <div class="tarjeta">
+    <a href="/" class="marca">{{ negocio.nombre }}</a>
+
+    {% if not turno %}
+      <h1>Turno no encontrado</h1>
+      <p>El link no es válido. Si necesitás ayuda, escribinos por WhatsApp.</p>
+
+    {% else %}
+      {% if recien_cancelado and turno.estado == 'cancelado' %}
+        <p class="aviso aviso--ok">Tu turno fue cancelado. ¡Gracias por avisar!</p>
+      {% endif %}
+
+      <h1>Hola, {{ turno.cliente.split()[0] }}</h1>
+      <dl class="detalle">
+        <dt>Servicio</dt><dd>{{ turno.servicio }}</dd>
+        <dt>Barbero</dt><dd>{{ turno.barbero }}</dd>
+        <dt>Día</dt><dd>{{ inicio | fecha_larga | capitalize }}</dd>
+        <dt>Hora</dt><dd>{{ inicio.strftime('%H:%M') }} h</dd>
+        <dt>Precio</dt><dd>{{ turno.precio_cobrado | pesos }}</dd>
+        <dt>Estado</dt><dd><span class="estado estado--{{ turno.estado }}">{{ turno.estado | capitalize }}</span></dd>
+      </dl>
+
+      {% if puede_cancelar %}
+        <form method="post" action="/turno/{{ request.path_params.token }}/cancelar"
+              onsubmit="return confirm('¿Seguro que querés cancelar el turno?')">
+          <button class="boton boton--borde boton--ancho" type="submit">Cancelar turno</button>
+        </form>
+        <p class="nota">Si no podés venir, cancelá así el horario queda libre para otra persona.</p>
+      {% endif %}
+    {% endif %}
+  </div>
+</main>
+{% endblock %}

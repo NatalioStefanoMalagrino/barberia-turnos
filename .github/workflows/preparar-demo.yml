@@ -1,0 +1,50 @@
+# Prepara una base de DEMO en la nube con un botón, sin instalar nada
+# en tu compu: crea las tablas, los usuarios del panel, 6 meses de datos
+# simulados y corre el ETL.
+#
+# Antes de usarlo, cargar en Settings > Secrets and variables > Actions:
+#   DATABASE_URL     la cadena de conexión de Neon, tal cual
+#   PANEL_PASSWORD   la contraseña para entrar al panel como "dueno" y "mati"
+#
+# ⚠ Borra todos los turnos y clientes. Usarlo SOLO en la base de demo,
+#   nunca en la de una barbería real.
+
+name: Preparar base de demo
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmar:
+        description: 'Escribí BORRAR para confirmar que se pueden borrar los turnos y clientes'
+        required: true
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Verificar confirmación
+        if: ${{ inputs.confirmar != 'BORRAR' }}
+        run: |
+          echo "No escribiste BORRAR: no se hizo nada."
+          exit 1
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Crear tablas y usuarios, cargar datos y correr el ETL
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PANEL_PASSWORD: ${{ secrets.PANEL_PASSWORD }}
+        run: |
+          python -m app.cli inicializar-db
+          python -m app.cli crear-usuario dueno --password "$PANEL_PASSWORD"
+          python -m app.cli crear-usuario mati --barbero Mati --password "$PANEL_PASSWORD"
+          python -m data.generar_datos --si-borrar-todo
+          python -m data.etl

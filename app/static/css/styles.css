@@ -1,0 +1,229 @@
+/* =====================================================================
+   Estilos de la landing, la página del turno y el panel.
+   Mobile-first: se diseña para el celular (de donde entra casi todo el
+   mundo, vía la bio de Instagram) y después se agranda con @media.
+   Los colores vienen como variables desde config/negocio.json.
+   ===================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--acento); }
+h1, h2, h3 { line-height: 1.1; margin: 0 0 .5em; }
+h1, h2 { font-family: "Bebas Neue", Impact, sans-serif; font-weight: 400; letter-spacing: .02em; }
+h2 { font-size: clamp(2.2rem, 7vw, 3.2rem); }
+
+.contenedor { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+.contenedor--angosto { max-width: 620px; }
+
+/* --------------------------------------------------------- botones */
+.boton {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px; padding: 0 22px;
+  border: 1px solid var(--acento); border-radius: 999px;
+  background: var(--acento); color: #111;
+  font: 600 15px/1 "Inter", sans-serif; text-decoration: none; cursor: pointer;
+  transition: transform .15s, opacity .15s;
+}
+.boton:hover { transform: translateY(-1px); }
+.boton:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.boton--borde { background: transparent; color: var(--acento); }
+.boton--chico { min-height: 38px; padding: 0 16px; font-size: 14px; }
+.boton--ancho { width: 100%; }
+
+/* ------------------------------------------------------------- nav */
+.nav {
+  position: sticky; top: 0; z-index: 10;
+  background: color-mix(in srgb, var(--fondo) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid color-mix(in srgb, var(--texto) 8%, transparent);
+}
+.nav__inner { display: flex; align-items: center; gap: 16px; min-height: 64px; }
+.marca {
+  font-family: "Bebas Neue", sans-serif; font-size: 1.6rem; letter-spacing: .04em;
+  color: var(--texto); text-decoration: none; margin-right: auto;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
+@media (max-width: 420px) { .nav .marca { font-size: 1.3rem; } }
+.nav__links { display: none; gap: 24px; }
+.nav__links a { color: var(--texto-suave); text-decoration: none; font-size: 15px; }
+.nav__links a:hover { color: var(--texto); }
+.nav__usuario { color: var(--texto-suave); font-size: 14px; }
+.nav form { margin: 0; }
+
+/* ------------------------------------------------------------ hero */
+.hero {
+  min-height: 78vh; display: flex; align-items: flex-end;
+  padding: 96px 0 56px;
+  /* Reemplazar por una foto real del local: url('/static/img/hero.jpg') */
+  background:
+    linear-gradient(180deg, transparent 0%, var(--fondo) 92%),
+    radial-gradient(circle at 75% 25%, color-mix(in srgb, var(--acento) 35%, transparent), transparent 55%),
+    repeating-linear-gradient(135deg, #1b1b1d 0 14px, #161618 14px 28px);
+}
+.etiqueta { color: var(--acento); text-transform: uppercase; letter-spacing: .18em; font-size: 13px; margin: 0 0 12px; }
+.hero h1 { font-size: clamp(3.2rem, 13vw, 6.5rem); max-width: 12ch; }
+.hero__texto { color: var(--texto-suave); max-width: 46ch; font-size: 1.05rem; }
+.hero__acciones { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+
+/* -------------------------------------------------------- secciones */
+.seccion { padding: 72px 0; }
+.seccion--superficie { background: var(--superficie); }
+.subtitulo { color: var(--texto-suave); margin-top: -8px; }
+
+.servicios { list-style: none; padding: 0; margin: 0; display: grid; gap: 1px;
+  background: color-mix(in srgb, var(--texto) 10%, transparent); border-radius: 16px; overflow: hidden; }
+.servicio { display: flex; justify-content: space-between; gap: 16px; padding: 20px; background: var(--fondo); }
+.servicio h3 { font-size: 1.1rem; margin-bottom: 4px; }
+.servicio p { margin: 0; color: var(--texto-suave); font-size: 14px; }
+.servicio__datos { text-align: right; white-space: nowrap; }
+.precio { display: block; font-weight: 600; color: var(--acento); }
+.duracion { color: var(--texto-suave); font-size: 13px; }
+
+/* ---------------------------------------------------------- reserva */
+.reserva { display: grid; gap: 28px; margin-top: 28px; }
+.paso { border: 0; padding: 0; margin: 0; min-width: 0; }
+.paso legend { display: flex; align-items: center; gap: 10px; font-weight: 600; margin-bottom: 12px; padding: 0; }
+.paso__num {
+  display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--acento); color: #111; font-size: 13px;
+}
+.opciones { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.opcion input { position: absolute; opacity: 0; pointer-events: none; }
+.opcion span {
+  display: flex; flex-direction: column; justify-content: center; min-height: 58px; padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, var(--texto) 16%, transparent); border-radius: 12px;
+  cursor: pointer; font-weight: 500; transition: border-color .15s, background .15s;
+}
+.opcion small { color: var(--texto-suave); font-weight: 400; font-size: 12.5px; }
+.opcion input:checked + span { border-color: var(--acento); background: color-mix(in srgb, var(--acento) 14%, transparent); }
+.opcion input:focus-visible + span { outline: 2px solid var(--acento); outline-offset: 2px; }
+
+.dias { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory; }
+.dia {
+  flex: 0 0 64px; scroll-snap-align: start; padding: 10px 0; text-align: center;
+  border: 1px solid color-mix(in srgb, var(--texto) 16%, transparent); border-radius: 12px;
+  background: transparent; color: var(--texto); cursor: pointer; font: inherit;
+}
+.dia small { display: block; color: var(--texto-suave); font-size: 12px; text-transform: capitalize; }
+.dia strong { font-size: 1.25rem; }
+.dia[aria-pressed="true"] { border-color: var(--acento); background: color-mix(in srgb, var(--acento) 14%, transparent); }
+.dia:disabled { opacity: .35; cursor: not-allowed; }
+
+.horarios { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; margin-top: 14px; }
+.hora {
+  min-height: 44px; border-radius: 10px; font: 500 15px "Inter", sans-serif; cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--texto) 16%, transparent); background: transparent; color: var(--texto);
+}
+.hora[aria-pressed="true"] { background: var(--acento); border-color: var(--acento); color: #111; }
+.horarios__vacio { grid-column: 1 / -1; color: var(--texto-suave); margin: 0; }
+
+.campo { display: grid; gap: 6px; font-size: 14px; color: var(--texto-suave); margin-bottom: 14px; }
+.campo input, .campo select {
+  min-height: 48px; padding: 0 14px; border-radius: 10px; font: 16px "Inter", sans-serif; /* 16px evita el zoom en iPhone */
+  border: 1px solid color-mix(in srgb, var(--texto) 18%, transparent);
+  background: var(--fondo); color: var(--texto);
+}
+.campo input:focus, .campo select:focus { outline: 2px solid var(--acento); outline-offset: 1px; border-color: transparent; }
+
+.error { color: #ff8a80; margin: 0; }
+.confirmacion { text-align: center; padding: 32px 0; }
+.confirmacion__icono {
+  width: 64px; height: 64px; margin: 0 auto 12px; display: grid; place-items: center;
+  border-radius: 50%; background: var(--acento); color: #111; font-size: 30px;
+}
+.nota { color: var(--texto-suave); font-size: 14px; }
+
+/* ------------------------------------------------ equipo y ubicación */
+.equipo { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; }
+.barbero { display: grid; gap: 10px; text-align: center; font-weight: 500; }
+.barbero__foto {
+  aspect-ratio: 1; border-radius: 16px; display: grid; place-items: center;
+  font: 3rem "Bebas Neue", sans-serif; color: var(--acento);
+  background: repeating-linear-gradient(135deg, #1d1d20 0 12px, #18181a 12px 24px);
+}
+.ubicacion { display: grid; gap: 28px; }
+.direccion { font-size: 1.1rem; }
+.horarios-texto { list-style: none; padding: 0; color: var(--texto-suave); margin: 0 0 24px; }
+.mapa { width: 100%; min-height: 280px; border: 0; border-radius: 16px; filter: grayscale(.8) invert(.9) contrast(.9); }
+
+.pie { padding: 28px 0; border-top: 1px solid color-mix(in srgb, var(--texto) 8%, transparent); color: var(--texto-suave); font-size: 14px; }
+.pie .contenedor { display: flex; justify-content: space-between; }
+
+/* ------------------------------------------ páginas chicas (turno, login) */
+.pagina-centrada { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
+.tarjeta {
+  width: 100%; max-width: 440px; padding: 28px; border-radius: 18px; background: var(--superficie);
+  border: 1px solid color-mix(in srgb, var(--texto) 8%, transparent);
+}
+.tarjeta .marca { display: block; margin-bottom: 16px; }
+.tarjeta h1 { font-size: 2.4rem; }
+.detalle { display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; margin: 0 0 24px; }
+.detalle dt { color: var(--texto-suave); }
+.detalle dd { margin: 0; font-weight: 500; }
+.aviso { padding: 12px 14px; border-radius: 10px; font-size: 14px; }
+.aviso--ok { background: #1f3b2a; color: #9be7b4; }
+.aviso--error { background: #45211f; color: #ffb4ab; }
+.estado { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+.estado--reservado { background: #2b3242; color: #aec6ff; }
+.estado--completado { background: #1f3b2a; color: #9be7b4; }
+.estado--ausente { background: #45211f; color: #ffb4ab; }
+.estado--cancelado { background: #333; color: #aaa; }
+
+/* ------------------------------------------------------------ panel */
+.panel__main { padding-top: 20px; padding-bottom: 48px; }
+.fecha-nav { display: flex; align-items: center; gap: 12px; }
+.fecha-nav__centro { flex: 1; text-align: center; }
+.fecha-nav h1 { font-size: 2rem; margin: 0; }
+.fecha-nav__centro a { font-size: 13px; }
+.resumen { list-style: none; padding: 0; margin: 20px 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.resumen li { background: var(--superficie); border-radius: 12px; padding: 12px 14px; color: var(--texto-suave); font-size: 13px; }
+.resumen strong { display: block; color: var(--texto); font-size: 1.3rem; }
+.vacio { color: var(--texto-suave); text-align: center; padding: 32px 0; }
+.agenda { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.turno {
+  display: grid; grid-template-columns: 56px 1fr; gap: 6px 12px; padding: 14px; border-radius: 14px;
+  background: var(--superficie); border-left: 3px solid #5d7bd6;
+}
+.turno--completado { border-left-color: #58c07c; }
+.turno--ausente { border-left-color: #e5675b; }
+.turno--cancelado { border-left-color: #555; opacity: .55; }
+.turno__hora { font-weight: 600; font-size: 1.05rem; }
+.turno__info { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+.turno__info > span:not(.chip) { width: 100%; color: var(--texto-suave); font-size: 14px; }
+.tel { font-size: 13px; }
+.chip { font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: var(--acento); color: #111; }
+.chip--suave { background: #333; color: #ccc; }
+.turno__acciones { grid-column: 1 / -1; }
+.turno__acciones form { display: flex; gap: 6px; margin: 0; }
+.accion {
+  flex: 1; min-height: 42px; border-radius: 10px; font: 600 14px "Inter", sans-serif; cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--texto) 16%, transparent); background: transparent; color: var(--texto);
+}
+.accion--ok { background: #1f3b2a; border-color: #2e5c40; color: #9be7b4; }
+.accion--mal { background: #45211f; border-color: #6b2f2b; color: #ffb4ab; }
+.panel__formularios { display: grid; gap: 12px; margin-top: 28px; }
+.panel__formularios .tarjeta { max-width: none; padding: 18px; }
+.panel__formularios summary { cursor: pointer; font-weight: 600; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; margin-top: 16px; }
+.form-grid .boton, .campo--ancho { grid-column: 1 / -1; }
+
+/* ---------------------------------------------------- pantallas grandes */
+@media (min-width: 760px) {
+  .nav__links { display: flex; }
+  .servicios { grid-template-columns: 1fr 1fr; }
+  .ubicacion { grid-template-columns: 1fr 1.2fr; align-items: center; }
+  .resumen { grid-template-columns: repeat(4, 1fr); }
+  .turno { grid-template-columns: 64px 1fr auto; align-items: center; }
+  .turno__acciones { grid-column: auto; }
+  .accion { flex: none; padding: 0 14px; }
+  .panel__formularios { grid-template-columns: 1fr 1fr; align-items: start; }
+}

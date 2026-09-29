@@ -1,0 +1,35 @@
+# Blueprint de Render: describe la web que Render tiene que crear.
+# La base de datos NO la crea Render: vive en Neon (gratis y sin
+# vencimiento). Ver docs/06-deploy.md.
+#
+# Cómo usarlo: en Render, New > Blueprint > elegir este repositorio.
+# Render pregunta dos cosas:
+#   DATABASE_URL    la cadena de conexión de Neon (tal cual la copiás)
+#   ADMIN_PASSWORD  la contraseña para entrar al panel como "dueno"
+#
+# Al arrancar, la app crea sola las tablas, el usuario y los datos de demo
+# (app/arranque.py). No hay que correr ningún comando.
+
+services:
+  - type: web
+    name: barberia-turnos
+    runtime: python
+    plan: free
+    # Misma región que la base en Neon (AWS US East, N. Virginia): la web
+    # hace varias consultas por página, y si la base está lejos cada una
+    # suma demora. Render no tiene región en Sudamérica.
+    region: virginia
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /salud
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: DATABASE_URL          # la de Neon; Render te la pide al crear el Blueprint
+        sync: false
+      - key: SECRET_KEY            # la inventa Render: larga y aleatoria
+        generateValue: true
+      - key: CARGAR_DEMO           # 6 meses de datos simulados para el pitch
+        value: "true"
+      - key: ADMIN_PASSWORD        # Render te la pide al crear el Blueprint
+        sync: false

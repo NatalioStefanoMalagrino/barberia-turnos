@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<header class="nav">
+  <div class="contenedor nav__inner">
+    <a href="#" class="marca">{{ negocio.nombre }}</a>
+    <nav class="nav__links">
+      <a href="#servicios">Servicios</a>
+      <a href="#equipo">Equipo</a>
+      <a href="#ubicacion">Ubicación</a>
+    </nav>
+    <a href="#reservar" class="boton boton--chico">Reservar</a>
+  </div>
+</header>
+
+<main>
+  <!-- HERO: lo primero que se ve desde el link de la bio de Instagram -->
+  <section class="hero">
+    <div class="contenedor hero__inner">
+      <p class="etiqueta">Barbería · Buenos Aires</p>
+      <h1>{{ negocio.slogan }}</h1>
+      <p class="hero__texto">{{ negocio.descripcion }}</p>
+      <div class="hero__acciones">
+        <a href="#reservar" class="boton">Reservá tu turno</a>
+        <a href="https://instagram.com/{{ negocio.instagram }}" class="boton boton--borde" target="_blank" rel="noopener">@{{ negocio.instagram }}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICIOS: salen de la tabla servicio -->
+  <section id="servicios" class="seccion">
+    <div class="contenedor">
+      <h2>Servicios</h2>
+      <ul class="servicios">
+        {% for s in servicios %}
+        <li class="servicio">
+          <div>
+            <h3>{{ s.nombre }}</h3>
+            <p>{{ s.descripcion }}</p>
+          </div>
+          <div class="servicio__datos">
+            <span class="precio">{{ s.precio | pesos }}</span>
+            <span class="duracion">{{ s.duracion_min }} min</span>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+
+  <!-- RESERVA: formulario en 4 pasos, lo maneja static/js/reserva.js -->
+  <section id="reservar" class="seccion seccion--superficie">
+    <div class="contenedor contenedor--angosto">
+      <h2>Reservá tu turno</h2>
+      <p class="subtitulo">Elegí servicio, barbero y horario. Te toma menos de un minuto.</p>
+
+      <form id="form-reserva" class="reserva" novalidate>
+        <fieldset class="paso">
+          <legend><span class="paso__num">1</span> Servicio</legend>
+          <div class="opciones" id="op-servicios">
+            {% for s in servicios %}
+            <label class="opcion">
+              <input type="radio" name="servicio_id" value="{{ s.id }}" data-duracion="{{ s.duracion_min }}" {% if loop.first %}checked{% endif %}>
+              <span>{{ s.nombre }}<small>{{ s.precio | pesos }} · {{ s.duracion_min }}'</small></span>
+            </label>
+            {% endfor %}
+          </div>
+        </fieldset>
+
+        <fieldset class="paso">
+          <legend><span class="paso__num">2</span> Barbero</legend>
+          <div class="opciones">
+            <label class="opcion">
+              <input type="radio" name="barbero_id" value="" checked>
+              <span>Cualquiera<small>el primero libre</small></span>
+            </label>
+            {% for b in barberos %}
+            <label class="opcion">
+              <input type="radio" name="barbero_id" value="{{ b.id }}">
+              <span>{{ b.nombre }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </fieldset>
+
+        <fieldset class="paso">
+          <legend><span class="paso__num">3</span> Día y horario</legend>
+          <div class="dias" id="dias" role="list"></div>
+          <div class="horarios" id="horarios" aria-live="polite"></div>
+        </fieldset>
+
+        <fieldset class="paso">
+          <legend><span class="paso__num">4</span> Tus datos</legend>
+          <label class="campo">Nombre
+            <input type="text" name="nombre" autocomplete="name" required minlength="2">
+          </label>
+          <label class="campo">Celular (WhatsApp)
+            <input type="tel" name="telefono" autocomplete="tel" inputmode="tel" placeholder="11 2345 6789" required>
+          </label>
+          <label class="campo"><span>Email <small>(opcional)</small></span>
+            <input type="email" name="email" autocomplete="email">
+          </label>
+        </fieldset>
+
+        <p class="error" id="error-reserva" role="alert" hidden></p>
+        <button type="submit" class="boton boton--ancho" id="btn-reservar" disabled>Elegí un horario</button>
+      </form>
+
+      <div class="confirmacion" id="confirmacion" hidden>
+        <p class="confirmacion__icono">✓</p>
+        <h3>¡Turno reservado!</h3>
+        <p id="confirmacion-detalle"></p>
+        <p class="nota">Guardá este link para ver o cancelar tu turno:</p>
+        <a id="confirmacion-link" class="boton boton--borde boton--ancho" href="#">Ver mi turno</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- EQUIPO -->
+  <section id="equipo" class="seccion">
+    <div class="contenedor">
+      <h2>Equipo</h2>
+      <ul class="equipo">
+        {% for b in barberos %}
+        <li class="barbero">
+          {# Reemplazar por la foto real: /static/img/barbero-{{ b.id }}.jpg #}
+          <div class="barbero__foto" aria-hidden="true">{{ b.nombre[0] }}</div>
+          <span>{{ b.nombre }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+
+  <!-- UBICACIÓN Y HORARIOS -->
+  <section id="ubicacion" class="seccion seccion--superficie">
+    <div class="contenedor ubicacion">
+      <div>
+        <h2>Dónde estamos</h2>
+        <p class="direccion">{{ negocio.direccion }}</p>
+        <ul class="horarios-texto">
+          {% for h in negocio.horarios_texto %}<li>{{ h }}</li>{% endfor %}
+        </ul>
+        <a class="boton boton--borde" href="https://wa.me/{{ negocio.whatsapp }}" target="_blank" rel="noopener">Escribinos por WhatsApp</a>
+      </div>
+      <iframe class="mapa" title="Mapa" loading="lazy"
+        src="https://www.google.com/maps?q={{ negocio.mapa_embed_query | urlencode }}&output=embed"></iframe>
+    </div>
+  </section>
+</main>
+
+<footer class="pie">
+  <div class="contenedor">
+    <span>{{ negocio.nombre }}</span>
+    <a href="/panel">Acceso barberos</a>
+  </div>
+</footer>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/reserva.js" defer></script>
+{% endblock %}
